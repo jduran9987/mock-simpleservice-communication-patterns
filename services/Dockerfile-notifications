@@ -34,7 +34,7 @@ ENV PATH="/src/.venv/bin:$PATH"
 ENV PYTHONPATH="/src"
 
 # Copy the rest of the application
-COPY users/ .
+COPY services/notifications/ .
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

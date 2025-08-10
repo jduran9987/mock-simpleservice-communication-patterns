@@ -279,7 +279,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mock-microservice-communication-patterns"
+name = "mock-simpleservice-communication-patterns"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

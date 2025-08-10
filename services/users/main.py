@@ -4,12 +4,19 @@ Simple user management microservice for testing microservice communication patte
 Provides basic CRUD operations for users with in-memory storage.
 No external dependencies or complex patterns - designed for experimentation.
 """
+import httpx
+import logging
+import os
+import time
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 
 app = FastAPI(title="User Service")
 
+# Application variables
+NOTIFICATION_SERVICE_BASE_URL = os.environ["NOTIFICATION_SERVICE_BASE_URL"]
 
 # Simple in-memory storage
 users = []
@@ -48,8 +55,8 @@ async def get_user(user_id: int) -> UserResponse:
     raise HTTPException(status_code=404, detail="User not found.")
 
 
-@app.post("/users", response_model=UserCreate)
-async def create_user(user: UserResponse) -> UserResponse:
+@app.post("/users", response_model=UserResponse)
+async def create_user(user: UserCreate) -> UserResponse:
     id = len(users) + 1
     
     user_data = {
@@ -57,8 +64,20 @@ async def create_user(user: UserResponse) -> UserResponse:
         "name": user.name,
         "email": user.email
     }
-
     users.append(user_data)
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            payload = {
+                "user_id": id,
+                "message": f"Welcome, {user.name}!",
+                "email": user.email,
+                "timestamp": time.time()
+            }
+            response = await client.post(f"{NOTIFICATION_SERVICE_BASE_URL}/notifications", json=payload)
+            response.raise_for_status()
+    except Exception as err:
+        logging.error(f"Notification error: {err}")
 
     return UserResponse(**user_data)
 

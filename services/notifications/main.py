@@ -54,8 +54,8 @@ async def get_notification(notification_id: int) -> NotificationResponse:
     raise HTTPException(status_code=404, detail="Notification not found.")
 
 
-@app.post("/notifications", response_model=NotificationCreate)
-async def create_notification(notification: NotificationResponse) -> NotificationResponse:
+@app.post("/notifications", response_model=NotificationResponse)
+async def create_notification(notification: NotificationCreate) -> NotificationResponse:
     id = len(notifications) + 1
 
     notification_data = {
@@ -63,7 +63,7 @@ async def create_notification(notification: NotificationResponse) -> Notificatio
         "user_id": notification.user_id,
         "message": notification.message,
         "email": notification.email,
-        "timestamp": time.time()
+        "timestamp": notification.timestamp
     }
 
     notifications.append(notification_data)
